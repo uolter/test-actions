@@ -19,6 +19,12 @@ jobs:
       - name: Build with Maven
         run: |
           echo "Build with maven"
+      
+      - name: Debug
+        run: |
+          echo "github.event_name ${{github.event_name}}"
+          echo "github.event.pull_request.merged ${{github.event.pull_request.merged}}"
+          echo "github.event.pull_request.base.ref ${{github.event.pull_request.base.ref}}"
 
       - name: Release
         if: ${{ github.event_name == 'pull_request' && github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main' }}
