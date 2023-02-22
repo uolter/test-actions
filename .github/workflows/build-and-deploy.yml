@@ -21,7 +21,7 @@ jobs:
           echo "Build with maven"
       
       - name: Debug
-        run: >
+        run: |
           echo "github.event_name ${{github.event_name}}"
           echo "github.event.pull_request.merged ${{github.event.pull_request.merged}}"
           echo "github.event.pull_request.base.ref ${{github.event.pull_request.base.ref}}"
