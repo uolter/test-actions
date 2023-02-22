@@ -1,0 +1,57 @@
+name: Java CI
+
+on:
+  push:
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    outputs:
+      new_release_published: ${{ steps.release.outputs.new_release_published }}
+      new_release_version: ${{ steps.release.outputs.new_release_version }}
+
+    steps:
+      - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c
+      - name: Set up JDK 11
+        uses: actions/setup-java@1df8dbefe2a8cbc99770194893dd902763bee34b
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+      - name: Build with Maven
+        run: |
+          echo "Build with maven"
+
+      - name: Release
+        if: ${{ github.event_name == 'pull_request' && github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main' }}
+        id: release
+        # from https://github.com/cycjimmy/semantic-release-action/commits/main
+        run: |
+          echo "release."
+      
+  deploy:
+    name: "Deploy"
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    strategy:
+        matrix:
+          include:
+          - environment: "uat"
+            env_short: "u"
+          - environment: "prod"
+            env_short: "p"
+
+    continue-on-error: false
+    environment: ${{ matrix.environment }}
+    env:
+      AWS_REGION: eu-south-1
+    if: ${{ github.event_name == 'pull_request' && github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main' }}
+    steps:
+      - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c
+      
+      - name: Build image
+        id: build-image
+        
+        run: |
+          echo "Run docker build."    
