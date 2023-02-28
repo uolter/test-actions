@@ -5,6 +5,7 @@ on:
     branches:
       - "**"
       - "!main"
+      - "!release-*"
   pull_request:
     types:
       - closed
@@ -69,16 +70,14 @@ jobs:
       - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c
       
       - name: Build image
+        if: ${{ (matrix.environment == 'prod' && github.event.pull_request.base.ref == 'main') || ( matrix.environment == 'uat' && github.event.pull_request.base.ref == 'release-uat' )}}
         id: build-image
         
         run: |
           echo "Run docker build."
-
+      
       - name: Deploy ${{ matrix.environment }}
-        if: (
-            (${{ matrix.environment == 'prod' && github.event.pull_request.base.ref == 'main' }}) ||
-            (${{ matrix.environment == 'uat' && github.event.pull_request.base.ref == 'release-uat' }})
-          )
+        if: ${{ (matrix.environment == 'prod' && github.event.pull_request.base.ref == 'main') || ( matrix.environment == 'uat' && github.event.pull_request.base.ref == 'release-uat' )}}
         id: deploy-image
         
         run: |
