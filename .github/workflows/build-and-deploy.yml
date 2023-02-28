@@ -19,6 +19,7 @@ jobs:
     outputs:
       new_release_published: ${{ steps.release.outputs.new_release_published }}
       new_release_version: ${{ steps.release.outputs.new_release_version }}
+      matrix: ${{ steps.setmatrix.outputs.matrix }}
 
     steps:
       - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c
@@ -36,15 +37,22 @@ jobs:
           echo "github.ref ${{github.ref}}"
 
       - name: Release
-        if: (
-          ${{ github.event_name == 'pull_request' && 
-              github.event.pull_request.merged == true && 
-              github.event.pull_request.base.ref == 'main' }} 
-          )
+        if: ${{ github.event_name == 'pull_request' && github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main' }} 
+
         id: release
         # from https://github.com/cycjimmy/semantic-release-action/commits/main
         run: |
           echo "release."
+      - name: Set Dynamic Matrix
+        id: setmatrix
+        run: |
+          if ${{ github.event.pull_request.base.ref == 'main' }}
+            matrixStringifiedObject="{\"include\":[{\"environment\":\"prod\", \"env_short\": \"p\"}]}
+          elif ${{ github.event.pull_request.base.ref == 'relase-uat' }}
+            matrixStringifiedObject="{\"include\":[{\"environment\":\"uat\", \"env_short\": \"u\"}]}
+          else
+            matrixStringifiedObject="{\"include\":[]}
+          echo "::set-output name=matrix::$matrixStringifiedObject"
       
   deploy:
     name: "Deploy"
@@ -54,30 +62,22 @@ jobs:
       id-token: write
       contents: read
     strategy:
-        matrix:
-          include:
-          - environment: "uat"
-            env_short: "u"
-          - environment: "prod"
-            env_short: "p"
+        matrix: ${{ fromJson(needs.job1.outputs.matrix) }}
 
     continue-on-error: false
     environment: ${{ matrix.environment }}
     env:
-      AWS_REGION: eu-south-1  
-    if: ${{ github.event_name == 'pull_request'  && github.event.pull_request.merged == true  && ( github.event.pull_request.base.ref == 'main' || github.event.pull_request.base.ref == 'release-uat' )}}
+      AWS_REGION: eu-south-1      
     steps:
       - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c
       
       - name: Build image
-        if: ${{ (matrix.environment == 'prod' && github.event.pull_request.base.ref == 'main') || ( matrix.environment == 'uat' && github.event.pull_request.base.ref == 'release-uat' )}}
         id: build-image
         
         run: |
           echo "Run docker build."
       
       - name: Deploy ${{ matrix.environment }}
-        if: ${{ (matrix.environment == 'prod' && github.event.pull_request.base.ref == 'main') || ( matrix.environment == 'uat' && github.event.pull_request.base.ref == 'release-uat' )}}
         id: deploy-image
         
         run: |
