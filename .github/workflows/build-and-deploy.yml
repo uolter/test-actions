@@ -60,7 +60,7 @@ jobs:
       
   deploy:
     name: "Deploy"
-    if: ${{ needs.build.outputs.matrix != "" }}
+    if: ${{ needs.build.outputs.matrix != '' }}
     needs: build
     runs-on: ubuntu-latest
     permissions:
