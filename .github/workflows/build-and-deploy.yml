@@ -67,8 +67,8 @@ jobs:
     if: (
       ${{ github.event_name == 'pull_request' && 
           github.event.pull_request.merged == true && 
-          (github.event.pull_request.base.ref == 'main' && matrix.environment == 'prod' || 
-           github.event.pull_request.base.ref == 'release-uat' && matrix.environment == 'uat' 
+          (github.event.pull_request.base.ref == 'main' && environment == 'prod' || 
+           github.event.pull_request.base.ref == 'release-uat' && environment == 'uat' 
           )}}
       )
     steps:
