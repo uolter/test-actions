@@ -53,6 +53,8 @@ jobs:
           else
             matrixStringifiedObject="{\"include\":[]}"
           fi
+
+          echo "Matring = $matrixStringifiedObject"
           
           echo "::set-output name=matrix::$matrixStringifiedObject"
       
