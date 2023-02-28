@@ -51,7 +51,7 @@ jobs:
           elif [ ${{ github.event.pull_request.base.ref == 'relase-uat' }} == true ]; then
             matrixStringifiedObject="{\"include\":[{\"environment\":\"uat\", \"env_short\": \"u\"}]}"
           else
-            matrixStringifiedObject="{\"include\":[]}"
+            matrixStringifiedObject="{\"include\":[{\"environment\":[], \"env_short\": []}]}"
           fi
 
           echo "Matring = $matrixStringifiedObject"
