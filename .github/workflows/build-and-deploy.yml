@@ -49,11 +49,11 @@ jobs:
             @semantic-release/git@10.0.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
+
       - name: Set Dynamic Matrix
         id: setmatrix
         run: |
-          if [ ${{ github.event.pull_request.base.ref == 'main' }} == true ]; then 
+          if [ ${{ steps.release.outputs.new_release_published == 'main' }} == true ]; then 
             matrixStringifiedObject="{\"include\":[{\"environment\":\"prod\", \"env_short\": \"p\"}]}"
           elif [ ${{ github.event.pull_request.base.ref == 'release-uat' }} == true ]; then
             matrixStringifiedObject="{\"include\":[{\"environment\":\"uat\", \"env_short\": \"u\"}]}"
