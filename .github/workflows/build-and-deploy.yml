@@ -64,8 +64,7 @@ jobs:
     environment: ${{ matrix.environment }}
     env:
       AWS_REGION: eu-south-1  
-    if: |
-        ${{ github.event_name == 'pull_request'  && github.event.pull_request.merged == true  && ( github.event.pull_request.base.ref == 'main' || github.event.pull_request.base.ref == 'release-uat' )}}
+    if: ${{ github.event_name == 'pull_request'  && github.event.pull_request.merged == true  && ( github.event.pull_request.base.ref == 'main' || github.event.pull_request.base.ref == 'release-uat' )}}
     steps:
       - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c
       
