@@ -10,6 +10,7 @@ on:
       - closed
     branches:
       - 'main'
+      - 'release-uat'
       
 jobs:
   build:
@@ -34,7 +35,11 @@ jobs:
           echo "github.ref ${{github.ref}}"
 
       - name: Release
-        if: ${{ github.event_name == 'pull_request' && github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main' }}
+        if: (
+          ${{ github.event_name == 'pull_request' && 
+              github.event.pull_request.merged == true && 
+              github.event.pull_request.base.ref == 'main' }} 
+          )
         id: release
         # from https://github.com/cycjimmy/semantic-release-action/commits/main
         run: |
@@ -59,7 +64,11 @@ jobs:
     environment: ${{ matrix.environment }}
     env:
       AWS_REGION: eu-south-1
-    if: ${{ github.event_name == 'pull_request' && github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main' }}
+    if: (
+      ${{ github.event_name == 'pull_request' && 
+          github.event.pull_request.merged == true && 
+          (github.event.pull_request.base.ref == 'main' && matrix.environment == 'prod' || github.event.pull_request.base.ref == 'release-uat' && matrix.environment == 'uat' ) }}
+      )
     steps:
       - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c
       
