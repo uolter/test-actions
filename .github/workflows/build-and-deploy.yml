@@ -84,7 +84,7 @@ jobs:
             (${{ matrix.environment == 'prod' && github.event.pull_request.base.ref == 'main' }}) ||
             (${{ matrix.environment == 'uat' && github.event.pull_request.base.ref == 'release-uat' }})
           )
-        id: build-image
+        id: deploy-image
         
         run: |
-          echo "Run docker build."    
+          echo "Run deploy."    
