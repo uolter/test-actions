@@ -48,13 +48,13 @@ jobs:
         run: |
           if [ ${{ github.event.pull_request.base.ref == 'main' }} == true ]; then 
             matrixStringifiedObject="{\"include\":[{\"environment\":\"prod\", \"env_short\": \"p\"}]}"
-          elif [ ${{ github.event.pull_request.base.ref == 'relase-uat' }} == true ]; then
+          elif [ ${{ github.event.pull_request.base.ref == 'release-uat' }} == true ]; then
             matrixStringifiedObject="{\"include\":[{\"environment\":\"uat\", \"env_short\": \"u\"}]}"
           else
             matrixStringifiedObject=""
           fi
 
-          echo "Matring = $matrixStringifiedObject"
+          echo "Marix = $matrixStringifiedObject"
           
           echo "::set-output name=matrix::$matrixStringifiedObject"
       
