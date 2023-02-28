@@ -3,14 +3,14 @@ name: Java CI
 on:
   push:
     branches:
-      - "*"
+      - "**"
       - "!main"
   pull_request:
     types:
       - closed
     branches:
-      - 'main'
-      - 'release-uat'
+      - "main"
+      - "release-*"
       
 jobs:
   build:
@@ -63,12 +63,8 @@ jobs:
     continue-on-error: false
     environment: ${{ matrix.environment }}
     env:
-      AWS_REGION: eu-south-1
-    if: (
-      ${{ github.event_name == 'pull_request' && 
-          github.event.pull_request.merged == true && 
-          (github.event.pull_request.base.ref == 'main' && matrix.environment == 'prod' || github.event.pull_request.base.ref == 'release-uat' && matrix.environment == 'uat' ) }}
-      )
+      AWS_REGION: eu-south-1  
+    if: ${{ github.event_name == 'pull_request'  && github.event.pull_request.merged == true  && ( github.event.pull_request.base.ref == 'main' || github.event.pull_request.base.ref == 'release-uat' )}}
     steps:
       - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c
       
@@ -76,4 +72,14 @@ jobs:
         id: build-image
         
         run: |
-          echo "Run docker build."    
+          echo "Run docker build."
+
+      - name: Deploy ${{ matrix.environment }}
+        if: (
+            (${{ matrix.environment == 'prod' && github.event.pull_request.base.ref == 'main' }}) ||
+            (${{ matrix.environment == 'uat' && github.event.pull_request.base.ref == 'release-uat' }})
+          )
+        id: deploy-image
+        
+        run: |
+          echo "Run deploy."    
