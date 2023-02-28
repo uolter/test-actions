@@ -36,17 +36,24 @@ jobs:
           echo "github.base_ref ${{github.base_ref}}"
           echo "github.ref ${{github.ref}}"
 
+      
       - name: Release
-        if: ${{ github.event_name == 'pull_request' && github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main' }} 
-
+        if: ${{ github.event_name == 'pull_request' && github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main' }}
         id: release
         # from https://github.com/cycjimmy/semantic-release-action/commits/main
-        run: |
-          echo "release."
+        uses: cycjimmy/semantic-release-action@bdd914ff2423e2792c73475f11e8da603182f32d
+        with:
+          semantic_version: 18.0.0
+          extra_plugins: |
+            @semantic-release/release-notes-generator@10.0.3
+            @semantic-release/git@10.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Set Dynamic Matrix
         id: setmatrix
         run: |
-          if [ ${{ github.event.pull_request.base.ref == 'main' }} == true ]; then 
+          if [ ${{ steps.release.outputs.new_release_published == 'main' }} == true ]; then 
             matrixStringifiedObject="{\"include\":[{\"environment\":\"prod\", \"env_short\": \"p\"}]}"
           elif [ ${{ github.event.pull_request.base.ref == 'release-uat' }} == true ]; then
             matrixStringifiedObject="{\"include\":[{\"environment\":\"uat\", \"env_short\": \"u\"}]}"
