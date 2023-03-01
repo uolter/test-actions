@@ -50,9 +50,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set Dynamic Matrix
+      - name: Set Dynamic Env Matrix
         id: setmatrix
         run: |
+
           if [ ${{ steps.release.outputs.new_release_published == 'true' }} == true ]; then 
             matrixStringifiedObject="{\"include\":[{\"environment\":\"prod\", \"env_short\": \"p\"}]}"
           elif [ ${{ github.event.pull_request.base.ref == 'release-uat' }} == true ]; then
@@ -60,10 +61,8 @@ jobs:
           else
             matrixStringifiedObject=""
           fi
-
-          echo "Marix = $matrixStringifiedObject"
           
-          echo "::set-output name=matrix::$matrixStringifiedObject"
+          echo "matrix=$matrixStringifiedObject" >> $GITHUB_OUTPUT
       
   deploy:
     name: "Deploy"
